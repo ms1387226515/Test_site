@@ -182,11 +182,13 @@
       );
       const server= new Map(serverRows.filter(r => !badServerRows.includes(r)).map(r=>[r.id,r]));
       const deleted=loadDeleted();
+      const localMap=new Map(data.exams.map(e=>[e.id,e]));
+      const merged=[];const upload=[];const newDeleted=[];let changed=false;
+      // Queue invalid legacy server rows for deletion after upload is initialized.
+      // This avoids the temporal-dead-zone error from referencing `upload` early.
       for (const bad of badServerRows) {
         upload.push({id:String(bad.id),user_id:user.id,data:{},updated_at:nowIso(),deleted:true});
       }
-      const localMap=new Map(data.exams.map(e=>[e.id,e]));
-      const merged=[];const upload=[];const newDeleted=[];let changed=false;
 
       const ids=new Set([...localMap.keys(),...server.keys(),...deleted.map(d=>d.id)]);
       for(const id of ids){
